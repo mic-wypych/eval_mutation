@@ -1,0 +1,40 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit-tests:
+    name: Python 3.14
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7.0.1
+
+      - name: Install uv and Python
+        uses: astral-sh/setup-uv@v10.0.1
+        with:
+          python-version: "3.14.2"
+          enable-cache: true
+
+      - name: Install locked dependencies
+        run: uv sync --locked
+
+      - name: Run unit tests
+        env:
+          PYDANTIC_AI_NO_BANNER: "1"
+        run: uv run --locked --no-sync python -m unittest discover -v
+
+      - name: Compile Python sources
+        run: uv run --locked --no-sync python -m compileall -q eval_mutation tests
