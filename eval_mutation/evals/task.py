@@ -149,10 +149,13 @@ class TriageEvalTask:
             action_counts["load_capability"] += 1
 
         usage = result.usage
+        audited_tool_calls = sum(action_counts.values())
         process = ProcessEvidence(
             loaded_capability_ids=loaded_capabilities,
             tool_call_counts=dict(sorted(action_counts.items())),
-            total_tool_calls=int(usage.get("tool_calls", sum(action_counts.values()))),
+            # Pydantic AI usage can omit terminal ToolOutput calls. The independent
+            # audit/message evidence is authoritative when it observes more calls.
+            total_tool_calls=max(int(usage.get("tool_calls", 0)), audited_tool_calls),
             failed_tool_calls=sum(not event.success for event in result.audit_events),
             model_requests=int(usage.get("requests", 0)),
             input_tokens=int(usage.get("input_tokens", 0)),

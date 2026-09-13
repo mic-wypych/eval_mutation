@@ -3,11 +3,12 @@ from __future__ import annotations
 import argparse
 import asyncio
 import sys
+from datetime import UTC, datetime
 from pathlib import Path
-
-from pydantic_evals.reporting import EvaluationReportAdapter
+from uuid import uuid4
 
 from eval_mutation.agent.triage_agent import AgentConfig
+from eval_mutation.evals.artifacts import write_eval_artifacts
 from eval_mutation.evals.dataset import load_dataset
 from eval_mutation.evals.task import TriageEvalTask
 from eval_mutation.observability import configure_observability
@@ -27,6 +28,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--repeat", type=int, default=1)
     parser.add_argument("--max-concurrency", type=int, default=1)
     parser.add_argument("--output", type=Path, default=None)
+    parser.add_argument("--run-id", default=None)
     parser.add_argument("--no-progress", action="store_true")
     return parser
 
@@ -62,9 +64,12 @@ async def _run(args: argparse.Namespace, *, observability_enabled: bool = False)
         dataset.cases = [case for case in dataset.cases if case.name in requested]
 
     config = _config(args)
+    run_id = args.run_id or (
+        f"eval-{datetime.now(UTC).strftime('%Y%m%dT%H%M%SZ')}-{uuid4().hex[:8]}"
+    )
     print(
         "[eval-mutation] eval started "
-        f"dataset={args.dataset} cases={len(dataset.cases)} model={config.model_name} "
+        f"run_id={run_id} dataset={args.dataset} cases={len(dataset.cases)} model={config.model_name} "
         f"repeat={args.repeat} concurrency={args.max_concurrency} "
         f"observability={'enabled' if observability_enabled else 'disabled'}",
         file=sys.stderr,
@@ -78,6 +83,7 @@ async def _run(args: argparse.Namespace, *, observability_enabled: bool = False)
         progress=not args.no_progress,
         repeat=args.repeat,
         metadata={
+            "run_id": run_id,
             "dataset_path": str(args.dataset),
             "model": config.model_dump(mode="json"),
         },
@@ -85,8 +91,24 @@ async def _run(args: argparse.Namespace, *, observability_enabled: bool = False)
     report.print(include_reasons=True)
 
     if args.output is not None:
-        args.output.parent.mkdir(parents=True, exist_ok=True)
-        args.output.write_bytes(EvaluationReportAdapter.dump_json(report, indent=2))
+        paths = write_eval_artifacts(
+            report=report,
+            dataset=dataset,
+            dataset_path=args.dataset,
+            output_path=args.output,
+            config=config,
+            project_root=args.project_root,
+            run_id=run_id,
+            repeat=args.repeat,
+            max_concurrency=args.max_concurrency,
+            observability_enabled=observability_enabled,
+        )
+        print(
+            f"[eval-mutation] artifacts written manifest={paths.manifest} rows={paths.rows} ",
+            f"summary={paths.summary} report={paths.report}",
+            file=sys.stderr,
+            flush=True,
+        )
 
     integrated_failures = [
         case.name
