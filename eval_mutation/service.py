@@ -11,6 +11,7 @@ from pydantic_ai.usage import UsageLimits
 from eval_mutation.agent.deps import AgentDeps
 from eval_mutation.agent.triage_agent import AgentConfig, build_agent
 from eval_mutation.domain.models import InboundRequest, TriageReceipt, TriageRunResult
+from eval_mutation.observability import triage_span
 from eval_mutation.storage.repository import TicketRepository
 
 
@@ -41,15 +42,35 @@ async def run_triage(
         run_id=resolved_run_id,
         now=resolved_now,
     )
-    result = await resolved_agent.run(
-        format_request_prompt(request),
-        deps=deps,
+    with triage_span(
+        request_id=request.request_id,
         run_id=resolved_run_id,
-        usage_limits=UsageLimits(
-            request_limit=resolved_config.request_limit,
-            tool_calls_limit=resolved_config.tool_calls_limit,
-        ),
-    )
+        model_name=resolved_config.model_name,
+        channel=request.channel.value,
+        account_tier=request.account_tier.value,
+    ) as span:
+        result = await resolved_agent.run(
+            format_request_prompt(request),
+            deps=deps,
+            run_id=resolved_run_id,
+            usage_limits=UsageLimits(
+                request_limit=resolved_config.request_limit,
+                tool_calls_limit=resolved_config.tool_calls_limit,
+            ),
+        )
+        if span is not None:
+            run_usage = dataclasses.asdict(result.usage)
+            span.set_attributes(
+                {
+                    "triage.team": result.output.team.value,
+                    "triage.urgency": result.output.urgency.value,
+                    "triage.related_ticket_count": len(result.output.related_ticket_ids),
+                    "triage.model_requests": run_usage.get("requests", 0),
+                    "triage.tool_calls": run_usage.get("tool_calls", 0),
+                    "triage.input_tokens": run_usage.get("input_tokens", 0),
+                    "triage.output_tokens": run_usage.get("output_tokens", 0),
+                }
+            )
 
     persisted = repository.get_ticket_by_request_id(request.request_id)
     persisted_links = repository.list_links(persisted.id) if persisted is not None else []

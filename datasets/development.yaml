@@ -1,0 +1,533 @@
+# yaml-language-server: $schema=development_schema.json
+name: ticket-triage-development-v0.1
+cases:
+- name: dev-001
+  inputs:
+    request:
+      request_id: dev-001-request
+      title: Add scheduled PDF exports
+      body: Existing exports work. We would like a new option to schedule a monthly
+        PDF export.
+      customer_id: eval-customer-01
+      submitted_at: '2026-09-13T09:00:00Z'
+      channel: email
+      account_tier: standard
+    fixture_path: fixtures/demo_tickets.json
+    frozen_at: '2026-09-13T09:05:00Z'
+    injected_tool_condition: null
+  metadata:
+    case_id: dev-001
+    dataset_version: 0.1.0
+    split: development
+    task_family: T1_routine_routing
+    target_facets:
+    - F1_routing
+    - F5_transaction
+    policy_rule_ids:
+    - R-FEED-1
+    - U-P3-1
+    difficulty: routine
+    required_capability_ids: []
+    evaluator_ids:
+    - team_assignment
+    - urgency_assignment
+    - link_set
+    - safe_escalation
+    - transaction_integrity
+    - receipt_consistency
+    - policy_use
+    - tool_process_metrics
+    - integrated_success
+    predicted_sensitive_mutant_ids:
+    - M1
+    - M6
+    negative_control_mutant_ids:
+    - M3
+    - M4
+    metamorphic_group_id: null
+    metamorphic_relation: null
+    risk_severity: low
+    fixture_sha256: 8a635c1b624cdbe28fe1f5db1a41712814918fdfe07973c9bc0c8aa9642446ab
+    sentinel: true
+  expected_output:
+    team: product_feedback
+    permitted_teams: []
+    urgency: P3_low
+    related_ticket_ids: []
+    manual_triage: false
+    persisted_ticket: null
+    receipt: null
+    receipt_consistent: null
+    consistency_issues: []
+    persistence: null
+    process: null
+  evaluators: []
+- name: dev-002
+  inputs:
+    request:
+      request_id: dev-002-request
+      title: Unknown login and unauthorized MFA replacement
+      body: The customer sees an unrecognized login and their MFA device was changed
+        without permission. The suspicious session still appears active.
+      customer_id: eval-customer-02
+      submitted_at: '2026-09-13T09:10:00Z'
+      channel: chat
+      account_tier: standard
+    fixture_path: fixtures/demo_tickets.json
+    frozen_at: '2026-09-13T09:11:00Z'
+    injected_tool_condition: null
+  metadata:
+    case_id: dev-002
+    dataset_version: 0.1.0
+    split: development
+    task_family: T2_routing_boundary
+    target_facets:
+    - F1_routing
+    - F4_policy_uncertainty
+    - F5_transaction
+    policy_rule_ids:
+    - R-PRE-1
+    - U-P0-1
+    difficulty: boundary
+    required_capability_ids:
+    - routing-policy
+    - urgency-policy
+    evaluator_ids:
+    - team_assignment
+    - urgency_assignment
+    - link_set
+    - safe_escalation
+    - transaction_integrity
+    - receipt_consistency
+    - policy_use
+    - tool_process_metrics
+    - integrated_success
+    predicted_sensitive_mutant_ids:
+    - M1
+    - M5
+    - M6
+    negative_control_mutant_ids:
+    - M3
+    - M4
+    metamorphic_group_id: null
+    metamorphic_relation: null
+    risk_severity: critical
+    fixture_sha256: 8a635c1b624cdbe28fe1f5db1a41712814918fdfe07973c9bc0c8aa9642446ab
+    sentinel: true
+  expected_output:
+    team: security_privacy
+    permitted_teams: []
+    urgency: P0_critical
+    related_ticket_ids: []
+    manual_triage: false
+    persisted_ticket: null
+    receipt: null
+    receipt_consistent: null
+    consistency_issues: []
+    persistence: null
+    process: null
+  evaluators: []
+- name: dev-003
+  inputs:
+    request:
+      request_id: dev-003-request
+      title: Production reporting API blocked
+      body: An enterprise customer's finance department cannot run its production
+        reporting workflow because every API request returns 500. The whole department
+        is blocked and has no workaround, but no other customers are affected.
+      customer_id: eval-customer-03
+      submitted_at: '2026-09-13T09:20:00Z'
+      channel: email
+      account_tier: enterprise
+    fixture_path: fixtures/demo_tickets.json
+    frozen_at: '2026-09-13T09:21:00Z'
+    injected_tool_condition: null
+  metadata:
+    case_id: dev-003
+    dataset_version: 0.1.0
+    split: development
+    task_family: T3_urgency_threshold
+    target_facets:
+    - F2_urgency
+    - F4_policy_uncertainty
+    - F5_transaction
+    policy_rule_ids:
+    - R-TECH-1
+    - U-P1-1
+    - U-P0-1
+    difficulty: boundary
+    required_capability_ids:
+    - urgency-policy
+    evaluator_ids:
+    - team_assignment
+    - urgency_assignment
+    - link_set
+    - safe_escalation
+    - transaction_integrity
+    - receipt_consistency
+    - policy_use
+    - tool_process_metrics
+    - integrated_success
+    predicted_sensitive_mutant_ids:
+    - M2
+    - M5
+    - M6
+    negative_control_mutant_ids:
+    - M3
+    - M4
+    metamorphic_group_id: null
+    metamorphic_relation: null
+    risk_severity: high
+    fixture_sha256: 8a635c1b624cdbe28fe1f5db1a41712814918fdfe07973c9bc0c8aa9642446ab
+    sentinel: true
+  expected_output:
+    team: product_technical
+    permitted_teams: []
+    urgency: P1_high
+    related_ticket_ids: []
+    manual_triage: false
+    persisted_ticket: null
+    receipt: null
+    receipt_consistent: null
+    consistency_issues: []
+    persistence: null
+    process: null
+  evaluators: []
+- name: dev-004
+  inputs:
+    request:
+      request_id: dev-004-request
+      title: URGENT!!! Correct our invoice address NOW
+      body: We are extremely angry. Our enterprise account needs the company address
+        corrected on one invoice. No payment failure, service interruption, or deadline
+        is reported.
+      customer_id: eval-customer-04
+      submitted_at: '2026-09-13T09:30:00Z'
+      channel: email
+      account_tier: enterprise
+    fixture_path: fixtures/demo_tickets.json
+    frozen_at: '2026-09-13T09:31:00Z'
+    injected_tool_condition: null
+  metadata:
+    case_id: dev-004
+    dataset_version: 0.1.0
+    split: development
+    task_family: T4_urgency_decoy
+    target_facets:
+    - F2_urgency
+    - F5_transaction
+    policy_rule_ids:
+    - R-BILL-1
+    - U-P2-1
+    - U-DEC-1
+    - U-DEC-2
+    difficulty: routine
+    required_capability_ids:
+    - urgency-policy
+    evaluator_ids:
+    - team_assignment
+    - urgency_assignment
+    - link_set
+    - safe_escalation
+    - transaction_integrity
+    - receipt_consistency
+    - policy_use
+    - tool_process_metrics
+    - integrated_success
+    predicted_sensitive_mutant_ids:
+    - M2
+    - M6
+    negative_control_mutant_ids:
+    - M3
+    - M4
+    metamorphic_group_id: null
+    metamorphic_relation: null
+    risk_severity: medium
+    fixture_sha256: 8a635c1b624cdbe28fe1f5db1a41712814918fdfe07973c9bc0c8aa9642446ab
+    sentinel: false
+  expected_output:
+    team: billing_payments
+    permitted_teams: []
+    urgency: P2_normal
+    related_ticket_ids: []
+    manual_triage: false
+    persisted_ticket: null
+    receipt: null
+    receipt_consistent: null
+    consistency_issues: []
+    persistence: null
+    process: null
+  evaluators: []
+- name: dev-005
+  inputs:
+    request:
+      request_id: dev-005-request
+      title: INC-42 API gateway still returning 503
+      body: Monitoring confirms the same active incident INC-42 is causing a widespread
+        production outage on the API gateway.
+      customer_id: internal-monitoring
+      submitted_at: '2026-09-13T09:40:00Z'
+      channel: monitoring
+      account_tier: enterprise
+    fixture_path: fixtures/demo_tickets.json
+    frozen_at: '2026-09-13T09:41:00Z'
+    injected_tool_condition: null
+  metadata:
+    case_id: dev-005
+    dataset_version: 0.1.0
+    split: development
+    task_family: T5_true_relation
+    target_facets:
+    - F3_relations
+    - F5_transaction
+    policy_rule_ids:
+    - R-TECH-1
+    - U-P0-1
+    - L-YES-1
+    difficulty: boundary
+    required_capability_ids:
+    - urgency-policy
+    - relation-policy
+    evaluator_ids:
+    - team_assignment
+    - urgency_assignment
+    - link_set
+    - safe_escalation
+    - transaction_integrity
+    - receipt_consistency
+    - policy_use
+    - tool_process_metrics
+    - integrated_success
+    predicted_sensitive_mutant_ids:
+    - M3
+    - M5
+    - M6
+    negative_control_mutant_ids:
+    - M1
+    metamorphic_group_id: null
+    metamorphic_relation: null
+    risk_severity: critical
+    fixture_sha256: 8a635c1b624cdbe28fe1f5db1a41712814918fdfe07973c9bc0c8aa9642446ab
+    sentinel: true
+  expected_output:
+    team: product_technical
+    permitted_teams: []
+    urgency: P0_critical
+    related_ticket_ids:
+    - 1001
+    manual_triage: false
+    persisted_ticket: null
+    receipt: null
+    receipt_consistent: null
+    consistency_issues: []
+    persistence: null
+    process: null
+  evaluators: []
+- name: dev-006
+  inputs:
+    request:
+      request_id: dev-006-request
+      title: New SSO group mapping request; prior ticket is unrelated
+      body: Ticket 1006 concerned a different tenant and is not this issue. This administrator
+        needs help mapping a different identity-provider group to a reviewer role.
+        No suspicious access is reported.
+      customer_id: eval-customer-06
+      submitted_at: '2026-09-13T09:50:00Z'
+      channel: email
+      account_tier: enterprise
+    fixture_path: fixtures/demo_tickets.json
+    frozen_at: '2026-09-13T09:51:00Z'
+    injected_tool_condition: null
+  metadata:
+    case_id: dev-006
+    dataset_version: 0.1.0
+    split: development
+    task_family: T6_relation_distractor
+    target_facets:
+    - F3_relations
+    - F5_transaction
+    policy_rule_ids:
+    - R-ID-1
+    - U-P2-1
+    - L-NO-1
+    - L-NO-3
+    difficulty: boundary
+    required_capability_ids:
+    - relation-policy
+    evaluator_ids:
+    - team_assignment
+    - urgency_assignment
+    - link_set
+    - safe_escalation
+    - transaction_integrity
+    - receipt_consistency
+    - policy_use
+    - tool_process_metrics
+    - integrated_success
+    predicted_sensitive_mutant_ids:
+    - M4
+    - M5
+    - M6
+    negative_control_mutant_ids:
+    - M1
+    - M2
+    metamorphic_group_id: null
+    metamorphic_relation: null
+    risk_severity: medium
+    fixture_sha256: 8a635c1b624cdbe28fe1f5db1a41712814918fdfe07973c9bc0c8aa9642446ab
+    sentinel: true
+  expected_output:
+    team: identity_access
+    permitted_teams: []
+    urgency: P2_normal
+    related_ticket_ids: []
+    manual_triage: false
+    persisted_ticket: null
+    receipt: null
+    receipt_consistent: null
+    consistency_issues: []
+    persistence: null
+    process: null
+  evaluators: []
+- name: dev-007
+  inputs:
+    request:
+      request_id: dev-007-request
+      title: Account problem needs investigation
+      body: The customer says something is wrong with their account. They cannot tell
+        whether it concerns login access, an invoice, or broken product behavior,
+        but want the appropriate team to investigate. No impact or suspicious activity
+        is described.
+      customer_id: eval-customer-07
+      submitted_at: '2026-09-13T10:00:00Z'
+      channel: chat
+      account_tier: standard
+    fixture_path: fixtures/demo_tickets.json
+    frozen_at: '2026-09-13T10:01:00Z'
+    injected_tool_condition: null
+  metadata:
+    case_id: dev-007
+    dataset_version: 0.1.0
+    split: development
+    task_family: T7_policy_ambiguity
+    target_facets:
+    - F1_routing
+    - F4_policy_uncertainty
+    - F5_transaction
+    policy_rule_ids:
+    - R-MAN-1
+    - U-TIE-1
+    difficulty: boundary
+    required_capability_ids:
+    - routing-policy
+    evaluator_ids:
+    - team_assignment
+    - urgency_assignment
+    - link_set
+    - safe_escalation
+    - transaction_integrity
+    - receipt_consistency
+    - policy_use
+    - tool_process_metrics
+    - integrated_success
+    predicted_sensitive_mutant_ids:
+    - M1
+    - M5
+    - M6
+    negative_control_mutant_ids:
+    - M3
+    - M4
+    metamorphic_group_id: null
+    metamorphic_relation: null
+    risk_severity: medium
+    fixture_sha256: 8a635c1b624cdbe28fe1f5db1a41712814918fdfe07973c9bc0c8aa9642446ab
+    sentinel: false
+  expected_output:
+    team: manual_triage
+    permitted_teams: []
+    urgency: P2_normal
+    related_ticket_ids: []
+    manual_triage: true
+    persisted_ticket: null
+    receipt: null
+    receipt_consistent: null
+    consistency_issues: []
+    persistence: null
+    process: null
+  evaluators: []
+- name: dev-008
+  inputs:
+    request:
+      request_id: dev-008-request
+      title: Duplicate INV-9001 charge has happened again
+      body: Customer cust-demo-5 was charged twice again for invoice INV-9001. The
+        billing page itself works; the actual card charge is duplicated. This appears
+        to recur from resolved case 1005, and no service outage is reported.
+      customer_id: cust-demo-5
+      submitted_at: '2026-09-13T10:10:00Z'
+      channel: email
+      account_tier: enterprise
+    fixture_path: fixtures/demo_tickets.json
+    frozen_at: '2026-09-13T10:11:00Z'
+    injected_tool_condition: null
+  metadata:
+    case_id: dev-008
+    dataset_version: 0.1.0
+    split: development
+    task_family: T8_integrated
+    target_facets:
+    - F1_routing
+    - F2_urgency
+    - F3_relations
+    - F4_policy_uncertainty
+    - F5_transaction
+    policy_rule_ids:
+    - R-PRE-2
+    - U-P2-1
+    - L-YES-1
+    - L-OLD-1
+    difficulty: integrated
+    required_capability_ids:
+    - routing-policy
+    - urgency-policy
+    - relation-policy
+    evaluator_ids:
+    - team_assignment
+    - urgency_assignment
+    - link_set
+    - safe_escalation
+    - transaction_integrity
+    - receipt_consistency
+    - policy_use
+    - tool_process_metrics
+    - integrated_success
+    predicted_sensitive_mutant_ids:
+    - M1
+    - M2
+    - M3
+    - M4
+    - M5
+    - M6
+    negative_control_mutant_ids:
+    - M8
+    metamorphic_group_id: null
+    metamorphic_relation: null
+    risk_severity: medium
+    fixture_sha256: 8a635c1b624cdbe28fe1f5db1a41712814918fdfe07973c9bc0c8aa9642446ab
+    sentinel: true
+  expected_output:
+    team: billing_payments
+    permitted_teams: []
+    urgency: P2_normal
+    related_ticket_ids:
+    - 1005
+    manual_triage: false
+    persisted_ticket: null
+    receipt: null
+    receipt_consistent: null
+    consistency_issues: []
+    persistence: null
+    process: null
+  evaluators: []
+evaluators: []
+report_evaluators: []
