@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import sys
 from pathlib import Path
 
 from pydantic_evals.reporting import EvaluationReportAdapter
@@ -9,6 +10,7 @@ from pydantic_evals.reporting import EvaluationReportAdapter
 from eval_mutation.agent.triage_agent import AgentConfig
 from eval_mutation.evals.dataset import load_dataset
 from eval_mutation.evals.task import TriageEvalTask
+from eval_mutation.observability import configure_observability
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -44,7 +46,7 @@ def _config(args: argparse.Namespace) -> AgentConfig:
     return config
 
 
-async def _run(args: argparse.Namespace) -> int:
+async def _run(args: argparse.Namespace, *, observability_enabled: bool = False) -> int:
     if args.repeat < 1:
         raise ValueError("--repeat must be at least 1")
     if args.max_concurrency < 1:
@@ -60,6 +62,14 @@ async def _run(args: argparse.Namespace) -> int:
         dataset.cases = [case for case in dataset.cases if case.name in requested]
 
     config = _config(args)
+    print(
+        "[eval-mutation] eval started "
+        f"dataset={args.dataset} cases={len(dataset.cases)} model={config.model_name} "
+        f"repeat={args.repeat} concurrency={args.max_concurrency} "
+        f"observability={'enabled' if observability_enabled else 'disabled'}",
+        file=sys.stderr,
+        flush=True,
+    )
     task = TriageEvalTask(config=config, project_root=args.project_root)
     report = await dataset.evaluate(
         task,
@@ -87,4 +97,6 @@ async def _run(args: argparse.Namespace) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
-    return asyncio.run(_run(_parser().parse_args(argv)))
+    args = _parser().parse_args(argv)
+    observability_enabled = configure_observability()
+    return asyncio.run(_run(args, observability_enabled=observability_enabled))

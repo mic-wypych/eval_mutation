@@ -3,12 +3,14 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from uuid import uuid4
 
 from eval_mutation.agent.triage_agent import AgentConfig
 from eval_mutation.domain.models import AccountTier, Channel, InboundRequest
+from eval_mutation.observability import configure_observability
 from eval_mutation.service import run_triage
 from eval_mutation.storage.fixtures import load_fixture
 from eval_mutation.storage.repository import TicketRepository
@@ -61,7 +63,7 @@ def _initialize(args: argparse.Namespace) -> int:
     return 0
 
 
-async def _triage(args: argparse.Namespace) -> int:
+async def _triage(args: argparse.Namespace, *, observability_enabled: bool = False) -> int:
     repository = TicketRepository(args.db)
     repository.initialize()
     submitted_at = (
@@ -90,6 +92,14 @@ async def _triage(args: argparse.Namespace) -> int:
     if args.timeout_seconds is not None:
         config.timeout_seconds = args.timeout_seconds
 
+    print(
+        "[eval-mutation] triage started "
+        f"request_id={request.request_id} model={config.model_name} db={args.db} "
+        f"request_timeout={config.timeout_seconds:g}s "
+        f"observability={'enabled' if observability_enabled else 'disabled'}",
+        file=sys.stderr,
+        flush=True,
+    )
     result = await run_triage(request, repository, config=config)
     print(result.model_dump_json(indent=2, exclude={"messages"}))
     if args.trace_out is not None:
@@ -113,4 +123,5 @@ def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     if args.command == "init-db":
         return _initialize(args)
-    return asyncio.run(_triage(args))
+    observability_enabled = configure_observability()
+    return asyncio.run(_triage(args, observability_enabled=observability_enabled))
